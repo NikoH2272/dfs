@@ -431,3 +431,112 @@ code { background: rgba(25,227,227,.1); padding: 1px 6px; border-radius: 4px; co
   .roster li { padding: 8px 10px; font-size: 13px; gap: 6px; }
   .roster li::before { width: 22px; font-size: 16px; }
 }
+
+/* =====================================================================
+   Animaciones y efectos (activados por assets/fx.js con la clase .fx)
+   ===================================================================== */
+@keyframes rise { from { opacity: 0; transform: translateY(16px) scale(.98); } }
+@keyframes float { 50% { translate: 0 -10px; } }
+@keyframes shine-text { 0%, 55% { background-position: 160% 0, 0 0; } 100% { background-position: -60% 0, 0 0; } }
+@keyframes sweep { to { transform: translateX(260%) skewX(-20deg); } }
+@keyframes glow-pulse { 50% { box-shadow: 0 0 0 6px rgba(25,227,227,0), 0 0 24px rgba(25,227,227,.35); } }
+
+.scroll-progress {
+  position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 60;
+  background: linear-gradient(90deg, var(--teal-dark), var(--teal), #8ffcf8);
+  box-shadow: 0 0 12px var(--teal); transform-origin: 0 50%; transform: scaleX(0); pointer-events: none;
+}
+
+/* Cascading entrance for lists ("backwards" so hover transforms still work after the entrance) */
+.fx .stagger > * { animation: rise .55s cubic-bezier(.2,.75,.25,1) backwards; animation-delay: calc(min(var(--i, 0), 14) * 45ms); }
+.fx section.block:not(.seen) .stagger > * { animation-play-state: paused; }
+@media (min-width: 769px) { .fx .sp-track.stagger > * { animation: none; } }
+.fx #schedule > .phase-head, .fx #results > * { animation: rise .45s ease backwards; }
+
+/* Hero: floating poster + 3D tilt (tilt only on desktop via fx.js) */
+.fx .hero-art { perspective: 900px; }
+.fx .hero-art img {
+  animation: float 6s ease-in-out infinite;
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform .25s ease-out;
+}
+/* Shine sweeping across "400 USD" */
+.fx .title-teal {
+  background-image: linear-gradient(110deg, transparent 42%, rgba(255,255,255,.85) 50%, transparent 58%), var(--teal-grad);
+  background-size: 260% 100%, 100% 100%;
+  background-repeat: no-repeat;
+  animation: shine-text 5s ease-in-out infinite;
+}
+.fx .kicker { animation: rise .6s ease backwards; }
+
+/* Buttons: light sweep on hover / tap */
+.btn { position: relative; overflow: hidden; isolation: isolate; }
+.btn::after {
+  content: ""; position: absolute; top: -10%; bottom: -10%; left: -60%; width: 40%; z-index: -1;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.45), transparent);
+  transform: translateX(0) skewX(-20deg); pointer-events: none; opacity: 0;
+}
+.btn:hover::after, .btn:active::after { opacity: 1; animation: sweep .7s ease; }
+.btn.ghost::after { background: linear-gradient(90deg, transparent, rgba(25,227,227,.35), transparent); }
+
+/* Tap feedback on touch screens */
+.btn:active, .tab:active, .social-card:active, .match:active, .sp-item:active, .roster li:active { transform: scale(.97); }
+.tab { transition: background .2s, color .2s, border-color .2s, transform .15s; }
+.match, .social-card, .stat, .prize-row, .chip, .roster li { transition: transform .25s ease, border-color .25s, background .25s, box-shadow .25s; }
+
+/* Live state badges breathe on every device */
+.fx .status.envivo, .fx .kicker.state-en_juego { animation: glow-pulse 1.8s ease-in-out infinite; }
+.fx .standings tr.qualified .q-tag { animation: glow-pulse 2.4s ease-in-out infinite; }
+
+/* Desktop hover effects */
+@media (hover: hover) and (pointer: fine) {
+  /* underline that grows under nav links */
+  .nav a { position: relative; }
+  .nav a::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -6px; height: 2px; background: var(--teal);
+    transform: scaleX(0); transform-origin: right; transition: transform .3s ease; box-shadow: 0 0 8px var(--teal);
+  }
+  .nav a:hover::after { transform: scaleX(1); transform-origin: left; }
+
+  /* spotlight that follows the cursor (position set by fx.js) */
+  .panel:not(.sponsors), .stat, .roster li { position: relative; }
+  .panel:not(.sponsors)::after, .stat::after, .roster li::after {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .3s;
+    background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgba(25,227,227,.13), transparent 70%);
+  }
+  .panel:not(.sponsors):hover::after, .stat:hover::after, .roster li:hover::after { opacity: 1; }
+
+  .match:hover { border-color: var(--line-strong); transform: translateX(4px); box-shadow: -4px 0 0 var(--teal), 0 10px 30px rgba(0,0,0,.35); }
+  .match:hover .date b { text-shadow: 0 0 18px rgba(25,227,227,.7); }
+  .social-card:hover .ico { background: var(--teal); color: var(--bg); transform: rotate(-8deg) scale(1.08); }
+  .social-card .ico { transition: background .25s, color .25s, transform .3s; }
+
+  .stat:hover { background: #0d262c; }
+  .stat b { transition: transform .3s, text-shadow .3s; }
+  .stat:hover b { transform: scale(1.12); text-shadow: 0 0 22px rgba(25,227,227,.6); }
+
+  .prize-row:hover { transform: translateX(6px); }
+  .prize-row:hover b { text-shadow: 0 0 16px rgba(25,227,227,.7); }
+  .chip:hover { border-color: var(--teal); transform: translateY(-2px); background: rgba(25,227,227,.14); }
+
+  .standings tbody tr { transition: background .2s; }
+  .standings tbody tr:hover td { background: rgba(25,227,227,.06); }
+  .standings .pos-badge { transition: transform .25s; }
+  .standings tbody tr:hover .pos-badge { transform: rotate(-8deg) scale(1.15); }
+
+  .roster li:hover { transform: translateY(-3px); border-color: var(--teal); box-shadow: 0 8px 20px rgba(0,0,0,.3); }
+  .tab:not(.active):hover { color: var(--teal); border-color: var(--line-strong); transform: translateY(-1px); }
+  .brand img { transition: transform .4s cubic-bezier(.3,1.6,.5,1), filter .3s; }
+  .brand:hover img { transform: rotate(-10deg) scale(1.1); filter: drop-shadow(0 0 8px var(--teal)); }
+}
+
+/* Mobile: a bit more life without hover */
+@media (max-width: 768px) {
+  .fx .sp-track.stagger > * { animation-duration: .5s; }
+  .fx .section-head h2 em { display: inline-block; animation: rise .7s ease backwards .15s; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-progress { display: none; }
+  .btn::after { display: none; }
+}
