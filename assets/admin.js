@@ -55,6 +55,10 @@
     d.tournament ??= {}; d.links ??= {};
     d.prizes ??= []; d.schedule ??= []; d.results ??= []; d.sponsors ??= [];
     d.tournament.state = STATES[d.tournament.state] ? d.tournament.state : "abierto";
+    // Start the rules editor from the default text the first time.
+    ["rulesText", "clarificationsText", "prohibitedText", "rulesNote"].forEach((k) => {
+      if (typeof d.tournament[k] !== "string") d.tournament[k] = DFS.DEFAULT_RULES[k];
+    });
     while (d.sponsors.length < SPONSOR_SLOTS) d.sponsors.push({ id: uuid(), name: "", logo: "", url: "" });
     return d;
   };

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/styles.css?v=2.2.0">
+  <link rel="stylesheet" href="assets/styles.css?v=2.3.0">
   <link rel="icon" href="assets/favicon.png">
 </head>
 <body>
@@ -56,6 +56,13 @@
           <h2>General</h2><p class="hint">Datos principales del torneo.</p>
           <div class="grid-2" id="general-fields"></div>
           <div class="field"><label>Aviso del cronograma</label><textarea data-bind="tournament.notice" rows="2"></textarea></div>
+          <h2 style="margin-top:22px">Reglamento</h2><p class="hint">Se abre desde el menú y desde cada grupo. Una línea por punto. En reglas oficiales usa <code>Título: texto</code>.</p>
+          <div class="field"><label>Reglas oficiales</label><textarea data-bind="tournament.rulesText" rows="7"></textarea></div>
+          <div class="grid-2">
+            <div class="field"><label>Aclaraciones</label><textarea data-bind="tournament.clarificationsText" rows="6"></textarea></div>
+            <div class="field"><label>Prohibido</label><textarea data-bind="tournament.prohibitedText" rows="6"></textarea></div>
+          </div>
+          <div class="field"><label>Nota final del reglamento</label><textarea data-bind="tournament.rulesNote" rows="2"></textarea></div>
           <div class="field"><label>Descripción</label><textarea data-bind="tournament.intro" rows="5"></textarea></div>
           <div class="field">
             <label>Imagen principal (póster)</label>
@@ -134,8 +141,8 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-  <script src="assets/config.js?v=2.2.0"></script>
-  <script src="assets/common.js?v=2.2.0"></script>
-  <script src="assets/admin.js?v=2.2.0"></script>
+  <script src="assets/config.js?v=2.3.0"></script>
+  <script src="assets/common.js?v=2.3.0"></script>
+  <script src="assets/admin.js?v=2.3.0"></script>
 </body>
 </html>

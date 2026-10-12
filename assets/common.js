@@ -108,5 +108,38 @@ const DFS = (() => {
     return sortRows([...map.values()]);
   };
 
-  return { sb, must, fetchFromSupabase, ICONS, esc, safeUrl, safeImg, loadData, total, sortRows, hasTeam, generalRows, PHASES, STATES, localTimes };
+  // Reglamento (editable from the admin; one item per line, "Título: texto" for official rules).
+  const DEFAULT_RULES = {
+    rulesText: [
+      "Nivel mínimo: Todos los jugadores deben tener nivel de cuenta 15 como mínimo.",
+      "Equipos incompletos: La organización no se hace responsable de jugadores que no ingresen a sala.",
+      "Sistema de comunicación: Se utilizará Discord a partir de semifinal. De no ingresar, obtendrán sanción en puntuación.",
+      "Tag o iniciales: Los equipos deben tener un mínimo de 2/4 jugadores con tag para fases y 3/4 con tag para la final. De lo contrario habrá sanción en puntuación.",
+      "Jugadores FFWS: Al equipo con jugador de liga sin registrar desde la fase de octavos se le descontarán los puntos del jugador.",
+    ].join("\n"),
+    clarificationsText: [
+      "Respetar casillas asignadas",
+      "Torneo solo móvil",
+      "2/4 tag obligatorio en fases, final 3/4",
+      "Se permite 1 jugador FFWS con registro y jugando desde octavos",
+      "Válido lista de eliminación",
+    ].join("\n"),
+    prohibitedText: ["Hacks o bugs", "Emuladores", "Faltas de respeto"].join("\n"),
+    rulesNote: "Jugador FFWS no registrado no tendrá derecho a jugar en demás fases.",
+  };
+  const lines = (txt) => (txt || "").split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  const getRules = (t = {}) => {
+    const pick = (k) => (typeof t[k] === "string" && t[k].trim() ? t[k] : DEFAULT_RULES[k]);
+    return {
+      rules: lines(pick("rulesText")).map((l) => {
+        const i = l.indexOf(":");
+        return i > 0 && i < 40 ? { title: l.slice(0, i).trim(), text: l.slice(i + 1).trim() } : { title: "", text: l };
+      }),
+      clarifications: lines(pick("clarificationsText")),
+      prohibited: lines(pick("prohibitedText")),
+      note: typeof t.rulesNote === "string" ? t.rulesNote.trim() : DEFAULT_RULES.rulesNote,
+    };
+  };
+
+  return { DEFAULT_RULES, getRules, sb, must, fetchFromSupabase, ICONS, esc, safeUrl, safeImg, loadData, total, sortRows, hasTeam, generalRows, PHASES, STATES, localTimes };
 })();

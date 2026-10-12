@@ -95,7 +95,10 @@
             <span title="${x.name}"><img src="https://flagcdn.com/w20/${x.code}.png" alt="${x.name}" width="20" height="15" loading="lazy">${x.label}</span>`).join("")}
           </div>
           ${m.note ? `<p>${esc(m.note)}</p>` : ""}
-          ${teams.length ? `<button class="roster-btn" type="button" aria-expanded="${open}">Ver equipos (${teams.length})</button>` : ""}
+          <div class="match-actions">
+            ${teams.length ? `<button class="roster-btn" type="button" aria-expanded="${open}">Ver equipos (${teams.length})</button>` : ""}
+            <button class="rules-btn" type="button" data-open-rules>Reglamento</button>
+          </div>
         </div>
         <span class="status ${esc(m.status)}">${statusLabel[m.status] || "Próximo"}</span>
         <div class="roster-wrap">${rosterList(teams, query)}</div>
@@ -158,6 +161,46 @@
   }
   if (t.notice) { $("#notice").hidden = false; $("#notice").textContent = t.notice; }
 
+  // ---------- Reglamento (dialog opened from the menu and from every group) ----------
+  const R = DFS.getRules(t);
+  const okIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg>`;
+  const noIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M6 6l12 12M18 6 6 18"/></svg>`;
+  $("#rules-body").innerHTML = `
+    <section class="rules-block">
+      <h3>Reglas oficiales</h3>
+      <ol class="rules-list">${R.rules.map((r) => `<li>${r.title ? `<b>${esc(r.title)}</b>` : ""}<p>${esc(r.text)}</p></li>`).join("")}</ol>
+    </section>
+    <div class="rules-cols">
+      <section class="rules-block">
+        <h3>Aclaraciones</h3>
+        <ul class="rules-checks ok">${R.clarifications.map((x) => `<li>${okIcon}<span>${esc(x)}</span></li>`).join("")}</ul>
+      </section>
+      <section class="rules-block">
+        <h3>Prohibido</h3>
+        <ul class="rules-checks no">${R.prohibited.map((x) => `<li>${noIcon}<span>${esc(x)}</span></li>`).join("")}</ul>
+      </section>
+    </div>
+    ${R.note ? `<p class="notice rules-note">${esc(R.note)}</p>` : ""}`;
+
+  const dlg = $("#rules-dialog");
+  const openRules = () => {
+    if (dlg.open) return;
+    dlg.showModal();
+    document.body.classList.add("modal-open");
+    dlg.querySelector(".rules-body").scrollTop = 0;
+    if (location.hash !== "#reglamento") history.replaceState(null, "", "#reglamento");
+  };
+  const closeRules = () => dlg.open && dlg.close();
+  dlg.addEventListener("close", () => {
+    document.body.classList.remove("modal-open");
+    if (location.hash === "#reglamento") history.replaceState(null, "", location.pathname + location.search);
+  });
+  document.addEventListener("click", (e) => {
+    if (e.target.closest("[data-open-rules]")) { e.preventDefault(); nav.classList.remove("open"); openRules(); }
+    else if (e.target.closest("[data-close-rules]") || e.target === dlg) closeRules();
+  });
+  if (location.hash === "#reglamento") openRules();
+
   // ---------- Results: phase → group / general ----------
   const tableHasData = (g) => (g.kind === "general" ? generalRows(results, g.phase).length : g.rows.some(hasTeam));
   const resPhases = [...PHASES, ...new Set(results.map((g) => g.phase))]
@@ -170,7 +213,8 @@
     if (!general && !g.rows.some(scored)) {
       const teams = g.rows.filter(hasTeam).map((r) => r.team.trim());
       $("#results").innerHTML = `
-        <div class="pending-head"><b>${esc(g.title)} · Equipos confirmados</b><span>Resultados pendientes</span></div>
+        <div class="pending-head"><b>${esc(g.title)} · Equipos confirmados</b><span>Resultados pendientes</span>
+          <button class="rules-btn" type="button" data-open-rules>Reglamento</button></div>
         ${rosterList(teams, "")}`;
       return;
     }

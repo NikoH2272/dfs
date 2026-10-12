@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/styles.css?v=2.2.0">
+  <link rel="stylesheet" href="assets/styles.css?v=2.3.0">
 </head>
 <body>
   <header class="topbar">
@@ -26,6 +26,7 @@
         <a href="#resultados">Resultados</a>
         <a href="#comunidad">Comunidad</a>
         <a href="#sponsors">Sponsors</a>
+        <a href="#reglamento" class="nav-rules" data-open-rules>Reglamento</a>
       </nav>
     </div>
   </header>
@@ -130,10 +131,24 @@
     </div>
   </footer>
 
+  <dialog class="rules-dialog" id="rules-dialog" aria-labelledby="rules-title">
+    <div class="rules-sheet">
+      <header class="rules-head">
+        <div><span class="eyebrow">DFS League S2</span><h2 id="rules-title">Reglamento</h2></div>
+        <button class="rules-close" type="button" aria-label="Cerrar reglamento" data-close-rules>✕</button>
+      </header>
+      <div class="rules-body" id="rules-body"></div>
+      <footer class="rules-foot">
+        <a class="btn ghost sm" href="assets/reglamento.webp" target="_blank" rel="noopener">Ver póster original</a>
+        <button class="btn sm" type="button" data-close-rules>Entendido</button>
+      </footer>
+    </div>
+  </dialog>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-  <script src="assets/config.js?v=2.2.0"></script>
-  <script src="assets/common.js?v=2.2.0"></script>
-  <script src="assets/app.js?v=2.2.0"></script>
-  <script src="assets/fx.js?v=2.2.0" defer></script>
+  <script src="assets/config.js?v=2.3.0"></script>
+  <script src="assets/common.js?v=2.3.0"></script>
+  <script src="assets/app.js?v=2.3.0"></script>
+  <script src="assets/fx.js?v=2.3.0" defer></script>
 </body>
 </html>
