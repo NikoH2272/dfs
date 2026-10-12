@@ -270,6 +270,15 @@ footer { margin-top: 72px; border-top: 1px solid var(--line); padding: 28px 0 40
 footer .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; }
 .hashtags { font-family: var(--font-display); letter-spacing: 2px; font-size: 20px; color: var(--text); }
 .hashtags b { color: var(--teal); font-weight: 400; }
+footer .credit { justify-content: center; margin-top: 22px; padding-top: 18px; border-top: 1px dashed var(--line); }
+.credit a {
+  display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: 14px; letter-spacing: 1px; text-transform: uppercase;
+  padding: 6px 14px; border-radius: 999px; border: 1px solid transparent; transition: color .2s, border-color .2s, background .2s;
+}
+.credit a b { color: var(--text); font-weight: 700; text-transform: none; letter-spacing: .5px; }
+.credit svg { width: 16px; height: 16px; color: var(--teal); }
+.credit a:hover { color: var(--teal); border-color: var(--line-strong); background: rgba(25,227,227,.06); }
+.credit a:hover b { color: var(--teal); }
 
 .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s, transform .6s; }
 .reveal.in { opacity: 1; transform: none; }
