@@ -627,3 +627,10 @@ body.modal-open { overflow: hidden; }
   .rules-list li::before { left: 10px; font-size: 24px; }
   .rules-foot .btn { flex: 1; }
 }
+
+/* ---------- Descargar tabla ---------- */
+.results-meta { align-items: center; }
+.dl-btn { margin-left: auto; }
+.dl-btn svg { width: 16px; height: 16px; }
+.dl-btn:disabled { opacity: .7; cursor: progress; }
+@media (max-width: 560px) { .dl-btn { width: 100%; margin-left: 0; } }

@@ -207,6 +207,16 @@
     .filter((p, i, a) => a.indexOf(p) === i && results.some((g) => g.phase === p && tableHasData(g)));
 
   const scored = (r) => (Number(r.kills) || 0) + (Number(r.placement) || 0) + (Number(r.penalty) || 0) > 0;
+  let currentTable = null;
+  $("#results").addEventListener("click", async (e) => {
+    const btn = e.target.closest("#dl-png");
+    if (!btn || !currentTable) return;
+    btn.disabled = true;
+    const label = btn.lastChild.textContent;
+    btn.lastChild.textContent = "Generando…";
+    try { await DFSDownload.png(currentTable); }
+    finally { btn.disabled = false; btn.lastChild.textContent = label; }
+  });
   const renderTable = (g) => {
     const general = g.kind === "general";
     // Before any score is loaded, show who plays instead of a table full of zeros.
@@ -224,6 +234,11 @@
     }
     const rows = general ? generalRows(results, g.phase) : sortRows(g.rows.filter(hasTeam));
     const q = Number(g.qualify) || 0;
+    // Snapshot used by the "Descargar" button.
+    currentTable = {
+      phase: g.phase, title: general ? "Tabla general" : g.title, general, qualify: q, updated: general ? "" : g.updated,
+      rows: rows.map((r) => ({ team: r.team.trim(), group: r.group || "", kills: Number(r.kills) || 0, placement: Number(r.placement) || 0, penalty: Number(r.penalty) || 0, total: total(r) })),
+    };
     $("#results").innerHTML = rows.length ? `
       <div class="table-wrap"><table class="standings">
         <thead><tr><th>#</th><th>Equipo</th>${general ? "<th>Grupo</th>" : ""}<th class="num">Kills</th><th class="num">P.P</th><th class="num">Sanc.</th><th class="num">Total</th></tr></thead>
@@ -238,7 +253,8 @@
             <td class="num total">${total(row)}</td>
           </tr>`).join("")}
         </tbody></table></div>
-      <div class="results-meta"><span>${esc(g.phase)}${q ? ` · Clasifican ${q}` : ""}</span><span>${!general && g.updated ? `Actualizado: ${esc(g.updated)}` : ""}</span></div>`
+      <div class="results-meta"><span>${esc(g.phase)}${q ? ` · Clasifican ${q}` : ""}</span><span>${!general && g.updated ? `Actualizado: ${esc(g.updated)}` : ""}</span>
+        <button class="btn sm dl-btn" type="button" id="dl-png"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Descargar</button></div>`
       : `<p class="empty">Aún no hay resultados para ${esc(g.title)}.</p>`;
   };
 
