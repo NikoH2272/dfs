@@ -662,3 +662,8 @@ body.modal-open { overflow: hidden; }
 @media (max-width: 560px) { .gen-grid { columns: 1; padding: 8px 12px 4px; } .gen-head { padding: 14px 12px 4px; } }
 .gen-grid.admin-gen { padding: 4px 0 0; }
 .gen-grid.admin-gen .gen-team small { text-transform: none; letter-spacing: .3px; }
+.dup-alert {
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between;
+  margin: 0 0 12px; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255,181,71,.45); background: rgba(255,181,71,.08); color: #ffd79a; font-size: 15px;
+}
+.gen-grid li.dup { border-color: rgba(255,181,71,.55); }

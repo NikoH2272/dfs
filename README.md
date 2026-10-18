@@ -36,15 +36,16 @@ La web solo lee; todo lo que escribe el admin pasa por funciones `staff_*` que v
   equipos tiene (`12/12`). Los equipos se guardan una sola vez y se ven en la web en el cronograma
   (“Ver equipos”, buscador “Busca tu equipo”) y en Resultados como “Equipos confirmados” hasta que se carguen puntos.
 - **Resultados**: grupos de 12 por fase. Total = Kills + P.P − Sanciones. “Clasifican (top N)” marca quiénes pasan,
-  y “Tabla general de la fase” suma todos los grupos de esa fase automáticamente.
+  y “Tabla general de la fase” ordena a todos los equipos de la fase. Cada grupo suma por separado: si un nombre
+  se repite en varios grupos se muestra con su grupo (`OLIS GA`, `OLIS GE`) y el admin avisa con un filtro “Ver solo repetidos”.
 - **Plantilla de equipos**: en cada grupo, “Pegar equipos” acepta la lista numerada (`1. OLIS`, `2. B17 E-SPORT`, …)
   y solo cambia los nombres. También acepta `Equipo, Kills, P.P, Sanciones` (sirve copiar desde Excel/Sheets).
   “Carga masiva” recibe varios grupos a la vez, cada bloque encabezado por `GRUPO A`, `GRUPO B`, …
 
 ## Publicar cambios de código
 
-Los archivos se cargan con `?v=2.4.2` (en `index.html` y `admin.html`). Cuando cambies CSS/JS, sube ese número
-(por ejemplo a `2.4.3`) para que los navegadores descarguen la versión nueva en vez de usar la que tienen en caché.
+Los archivos se cargan con `?v=2.4.3` (en `index.html` y `admin.html`). Cuando cambies CSS/JS, sube ese número
+(por ejemplo a `2.4.4`) para que los navegadores descarguen la versión nueva en vez de usar la que tienen en caché.
 Los cambios hechos desde el admin (resultados, cronograma, etc.) no necesitan esto: se ven al recargar.
 
 ## Probar en local

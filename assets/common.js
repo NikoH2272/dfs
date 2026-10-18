@@ -92,20 +92,35 @@ const DFS = (() => {
     [...rows].sort((a, b) => total(b) - total(a) || (b.placement || 0) - (a.placement || 0) || (b.kills || 0) - (a.kills || 0));
   const hasTeam = (r) => (r.team || "").trim() !== "";
 
-  // A "general" table sums every team across the group tables of the same phase.
+  // Short group tag: "Grupo A" -> "GA", "Final" -> "F".
+  const groupTag = (title) => {
+    const m = (title || "").trim().match(/^grupo\s+(\S+)/i);
+    return m ? `G${m[1].toUpperCase()}` : (title || "").trim().slice(0, 1).toUpperCase();
+  };
+
+  // A "general" table ranks every group entry of the phase. Each group counts on its own
+  // (points are never merged). Names used in more than one group get the group tag: "OLIS GA", "OLIS GE".
   const generalRows = (results, phase) => {
-    const map = new Map();
+    const entries = [];
     results.filter((g) => g.phase === phase && g.kind !== "general").forEach((g) => {
       g.rows.filter(hasTeam).forEach((r) => {
-        const key = r.team.trim().toLowerCase();
-        const acc = map.get(key) || { team: r.team.trim(), group: g.title, kills: 0, placement: 0, penalty: 0 };
-        acc.kills += Number(r.kills) || 0;
-        acc.placement += Number(r.placement) || 0;
-        acc.penalty += Number(r.penalty) || 0;
-        map.set(key, acc);
+        entries.push({
+          name: r.team.trim(), group: g.title, tag: groupTag(g.title),
+          kills: Number(r.kills) || 0, placement: Number(r.placement) || 0, penalty: Number(r.penalty) || 0,
+        });
       });
     });
-    return sortRows([...map.values()]);
+    const groupsByName = new Map();
+    entries.forEach((e) => {
+      const key = e.name.toLowerCase();
+      groupsByName.set(key, (groupsByName.get(key) || new Set()).add(e.group));
+    });
+    entries.forEach((e) => {
+      e.dupGroups = [...groupsByName.get(e.name.toLowerCase())];
+      e.dup = e.dupGroups.length > 1;
+      e.team = e.dup ? `${e.name} ${e.tag}` : e.name;
+    });
+    return sortRows(entries);
   };
 
   // Reglamento (editable from the admin; one item per line, "Título: texto" for official rules).
@@ -141,5 +156,5 @@ const DFS = (() => {
     };
   };
 
-  return { DEFAULT_RULES, getRules, sb, must, fetchFromSupabase, ICONS, esc, safeUrl, safeImg, loadData, total, sortRows, hasTeam, generalRows, PHASES, STATES, localTimes };
+  return { DEFAULT_RULES, getRules, sb, must, fetchFromSupabase, ICONS, esc, safeUrl, safeImg, loadData, total, sortRows, hasTeam, generalRows, groupTag, PHASES, STATES, localTimes };
 })();

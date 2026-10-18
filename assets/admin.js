@@ -10,6 +10,8 @@
   let dirty = false;
   let curPhase = PHASES[0];
   const touchedGroups = new Set(); // result groups whose scores changed
+  const dupOnly = new Set(); // phases whose general preview shows only repeated names
+  const showGeneral = new Set(); // phases with the full general ranking panel open
 
   // ---------- helpers ----------
   const get = (path) => path.split(".").reduce((o, k) => (o == null ? o : o[k]), data);
@@ -257,9 +259,38 @@
     }).join("");
   }
 
+  // Full ranking of a phase (every team), used by the general table and the "Ver tabla general completa" panel.
+  function generalPreview(phase, q) {
+    const rows = generalRows(data.results, phase);
+    const dups = rows.filter((x) => x.dup);
+    if (!rows.length) return `<p class="hint">Aún no hay equipos cargados en ${esc(phase)}.</p>`;
+    return `
+          ${dups.length ? `<div class="dup-alert">
+            <span>⚠ ${dups.length} nombres se repiten en varios grupos y se muestran con su grupo (ej. <b>${esc(dups[0].team)}</b>). Cada grupo suma por separado.</span>
+            <button class="btn ghost sm" data-dupfilter="${esc(phase)}">${dupOnly.has(phase) ? "Ver todos" : "Ver solo repetidos"}</button>
+          </div>` : ""}
+          ${rows.length ? `<ol class="gen-grid admin-gen">${rows.map((row, k) => (dupOnly.has(phase) && !row.dup) ? "" : `
+            <li class="${k < q ? "qualified" : ""} ${k === q - 1 ? "cutline" : ""} ${k < 3 ? `top${k + 1}` : ""} ${row.dup ? "dup" : ""}">
+              <span class="gen-pos">${k + 1}</span>
+              <span class="gen-team"><b>${esc(row.team)}</b>
+                <small>${esc(row.group)} · K ${Number(row.kills) || 0} · P.P ${Number(row.placement) || 0}${row.penalty ? ` · S -${Number(row.penalty)}` : ""}</small></span>
+              <span class="gen-pts">${total(row)}</span>
+            </li>`).join("")}
+          </ol>` : ""}
+`;
+  }
+
   function renderResults() {
     renderPhaseFilter();
     const idx = data.results.map((g, i) => (g.phase === curPhase ? i : -1)).filter((i) => i >= 0);
+    const genQ = Number(data.results.find((g) => g.phase === curPhase && g.kind === "general")?.qualify) || 0;
+    $("#general-full").innerHTML = showGeneral.has(curPhase) ? `
+      <div class="row-card">
+        <div class="row-head"><b>Tabla general completa · ${esc(curPhase)}</b>
+          <button class="btn ghost sm" data-togglegeneral="1">Ocultar</button></div>
+        ${generalPreview(curPhase, genQ)}
+      </div>` : "";
+    $("#toggle-general").textContent = showGeneral.has(curPhase) ? "Ocultar tabla general" : "Ver tabla general completa";
     $("#results-list").innerHTML = idx.map((i) => {
       const r = data.results[i];
       const q = Number(r.qualify) || 0;
@@ -274,15 +305,8 @@
         const rows = generalRows(data.results, r.phase);
         return `<div class="row-card">${head}
           <div class="grid-2">${input(`results.${i}.qualify`, "Clasifican (top N)", { type: "number" })}</div>
-          <p class="hint">Se calcula sola sumando todos los grupos de ${esc(r.phase)} (${rows.length} equipos con resultados).</p>
-          ${rows.length ? `<ol class="gen-grid admin-gen">${rows.map((row, k) => `
-            <li class="${k < q ? "qualified" : ""} ${k === q - 1 ? "cutline" : ""} ${k < 3 ? `top${k + 1}` : ""}">
-              <span class="gen-pos">${k + 1}</span>
-              <span class="gen-team"><b>${esc(row.team)}</b>
-                <small>${esc(row.group)} · K ${Number(row.kills) || 0} · P.P ${Number(row.placement) || 0}${row.penalty ? ` · S -${Number(row.penalty)}` : ""}</small></span>
-              <span class="gen-pts">${total(row)}</span>
-            </li>`).join("")}
-          </ol>` : ""}
+          <p class="hint">Se calcula sola con todos los grupos de ${esc(r.phase)} (${rows.length} equipos). Cada grupo cuenta por separado.</p>
+          ${generalPreview(r.phase, q)}
         </div>`;
       }
       const ranked = new Set(sortRows(r.rows.filter((x) => (x.team || "").trim())).slice(0, q));
@@ -522,6 +546,12 @@
       if (j < 0 || j >= data.results.length) return;
       [data.results[i], data.results[j]] = [data.results[j], data.results[i]];
       renderResults(); markDirty();
+    } else if (d.togglegeneral !== undefined || t.id === "toggle-general") {
+      showGeneral.has(curPhase) ? showGeneral.delete(curPhase) : showGeneral.add(curPhase);
+      renderResults();
+    } else if (d.dupfilter !== undefined) {
+      dupOnly.has(d.dupfilter) ? dupOnly.delete(d.dupfilter) : dupOnly.add(d.dupfilter);
+      renderResults();
     } else if (d.rosterbox !== undefined) {
       const box = document.querySelector(`[data-roster="${CSS.escape(d.rosterbox)}"]`);
       box.hidden = !box.hidden;
