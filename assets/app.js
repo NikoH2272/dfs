@@ -239,6 +239,20 @@
       phase: g.phase, title: general ? "Tabla general" : g.title, general, qualify: q, updated: general ? "" : g.updated,
       rows: rows.map((r) => ({ team: r.team.trim(), group: r.group || "", kills: Number(r.kills) || 0, placement: Number(r.placement) || 0, penalty: Number(r.penalty) || 0, total: total(r) })),
     };
+    if (general) {
+      $("#results").innerHTML = `
+        <div class="gen-head"><b>Tabla general · ${esc(g.phase)}</b><span>${rows.length} equipos · puntos totales${q ? ` · clasifican ${q}` : ""}</span></div>
+        <ol class="gen-grid">${rows.map((row, k) => `
+          <li class="${k < q ? "qualified" : ""} ${k === q - 1 ? "cutline" : ""} ${k < 3 ? `top top${k + 1}` : ""}">
+            <span class="gen-pos">${k + 1}</span>
+            <span class="gen-team"><b>${esc(row.team)}</b><small>${esc(row.group)}</small></span>
+            <span class="gen-pts">${total(row)}</span>
+          </li>`).join("")}
+        </ol>
+        <div class="results-meta"><span>Puntos = Kills + P.P − Sanciones</span><span></span>
+          <button class="btn sm dl-btn" type="button" id="dl-png"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Descargar</button></div>`;
+      return;
+    }
     $("#results").innerHTML = rows.length ? `
       <div class="table-wrap"><table class="standings">
         <thead><tr><th>#</th><th>Equipo</th>${general ? "<th>Grupo</th>" : ""}<th class="num">Kills</th><th class="num">P.P</th><th class="num">Sanc.</th><th class="num">Total</th></tr></thead>

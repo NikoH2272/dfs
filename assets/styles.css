@@ -634,3 +634,29 @@ body.modal-open { overflow: hidden; }
 .dl-btn svg { width: 16px; height: 16px; }
 .dl-btn:disabled { opacity: .7; cursor: progress; }
 @media (max-width: 560px) { .dl-btn { width: 100%; margin-left: 0; } }
+
+/* ---------- Tabla general en columnas ---------- */
+.gen-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 6px 14px; padding: 18px 18px 6px; }
+.gen-head b { font-family: var(--font-display); font-weight: 400; font-size: 28px; letter-spacing: 1px; }
+.gen-head span { color: var(--muted); font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; font-size: 13px; }
+.gen-grid { list-style: none; margin: 0; padding: 10px 18px 6px; columns: 3; column-gap: 16px; }
+.gen-grid li {
+  break-inside: avoid; display: flex; align-items: center; gap: 10px; margin-bottom: 6px;
+  padding: 7px 12px 7px 8px; border-radius: 9px; background: rgba(25,227,227,.035); border: 1px solid transparent;
+}
+.gen-grid li.qualified { background: rgba(25,227,227,.09); box-shadow: inset 3px 0 0 var(--teal); }
+.gen-grid li.cutline { border-bottom: 2px dashed var(--teal); }
+.gen-pos { flex: none; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 7px; font-family: var(--font-display); font-size: 19px; color: var(--teal); }
+.gen-grid li.top1 .gen-pos { background: var(--teal); color: var(--bg); }
+.gen-grid li.top2 .gen-pos { background: #cfdadc; color: var(--bg); }
+.gen-grid li.top3 .gen-pos { background: #0a8f99; color: #fff; }
+.gen-team { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.15; }
+.gen-team b { font-weight: 700; text-transform: uppercase; letter-spacing: .4px; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gen-team small { color: var(--muted); font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
+.gen-pts { flex: none; font-family: var(--font-display); font-size: 26px; color: var(--teal); min-width: 40px; text-align: right; }
+@media (hover: hover) and (pointer: fine) {
+  .gen-grid li { transition: transform .2s, border-color .2s; }
+  .gen-grid li:hover { transform: translateX(3px); border-color: var(--line-strong); }
+}
+@media (max-width: 900px) { .gen-grid { columns: 2; } }
+@media (max-width: 560px) { .gen-grid { columns: 1; padding: 8px 12px 4px; } .gen-head { padding: 14px 12px 4px; } }

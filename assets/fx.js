@@ -25,7 +25,7 @@
 
   // ---------- Staggered entrances (re-applied whenever app.js re-renders a list) ----------
   // Children animate in one after another; lists below the fold wait until their section is visible.
-  const STAGGER = [".timeline", ".roster", ".standings tbody", ".stats", "#prizes", ".chips", ".sp-track", "#result-tabs", "#sched-phases", "#phase-tabs"];
+  const STAGGER = [".timeline", ".roster", ".gen-grid", ".standings tbody", ".stats", "#prizes", ".chips", ".sp-track", "#result-tabs", "#sched-phases", "#phase-tabs"];
   const applyStagger = () => {
     document.querySelectorAll(STAGGER.join(",")).forEach((p) => {
       p.classList.add("stagger");

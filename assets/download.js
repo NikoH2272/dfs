@@ -121,6 +121,100 @@ const DFSDownload = (() => {
     return new Promise((res) => cv.toBlob(res, "image/png"));
   }
 
+  // General table: every team, only position + team + total, laid out in columns (top to bottom).
+  async function drawGeneral(t) {
+    await Promise.all([
+      document.fonts.load('400 40px "Bebas Neue"'),
+      document.fonts.load('700 20px "Rajdhani"'),
+    ]).catch(() => {});
+    const logo = await loadImg("assets/logo.webp");
+    const DISPLAY = '"Bebas Neue", Impact, sans-serif', BODY = '"Rajdhani", "Segoe UI", sans-serif';
+
+    const n = t.rows.length;
+    const cols = n <= 15 ? 1 : n <= 50 ? 2 : n <= 100 ? 3 : 4;
+    const perCol = Math.ceil(n / cols);
+    const ROW = [58, 46, 38, 34][cols - 1];
+    const HEAD = 300, FOOT = 140, PAD = 40, GAP = 14;
+    const H = HEAD + perCol * ROW + FOOT;
+    const SCALE = 2; // crisp when zooming on a phone
+    const cv = document.createElement("canvas");
+    cv.width = W * SCALE; cv.height = H * SCALE;
+    const ctx = cv.getContext("2d");
+    ctx.scale(SCALE, SCALE);
+
+    // background + glow + grid
+    ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
+    const glow = ctx.createRadialGradient(W / 2, -80, 40, W / 2, -80, 760);
+    glow.addColorStop(0, "rgba(25,227,227,.32)"); glow.addColorStop(1, "rgba(25,227,227,0)");
+    ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = "rgba(25,227,227,.05)"; ctx.lineWidth = 1;
+    for (let x = 0; x < W; x += 48) { ctx.beginPath(); ctx.moveTo(x + .5, 0); ctx.lineTo(x + .5, H); ctx.stroke(); }
+    for (let y = 0; y < H; y += 48) { ctx.beginPath(); ctx.moveTo(0, y + .5); ctx.lineTo(W, y + .5); ctx.stroke(); }
+
+    // header
+    ctx.fillStyle = C.text; ctx.font = `700 20px ${BODY}`; ctx.textBaseline = "alphabetic";
+    ctx.fillText("FREE FIRE", 60, 58);
+    ctx.textAlign = "right"; ctx.fillText("DFS  |  2026", W - 60, 58); ctx.textAlign = "left";
+    if (logo) { const lh = 120, lw = logo.width * (lh / logo.height); ctx.drawImage(logo, 60, 86, lw, lh); }
+    const tx = logo ? 60 + 120 * (logo.width / logo.height) + 30 : 60;
+    const silver = ctx.createLinearGradient(0, 96, 0, 170);
+    silver.addColorStop(0, "#ffffff"); silver.addColorStop(.5, "#d9e2e4"); silver.addColorStop(1, "#8d9a9d");
+    ctx.fillStyle = silver; ctx.font = `400 84px ${DISPLAY}`;
+    ctx.fillText("DFS LEAGUE S2", tx, 166);
+    ctx.fillStyle = C.teal; fit(ctx, `TABLA GENERAL · ${t.phase}`.toUpperCase(), W - tx - 60, 44, DISPLAY, "400");
+    ctx.fillText(`TABLA GENERAL · ${t.phase}`.toUpperCase(), tx, 214);
+    ctx.fillStyle = C.muted; ctx.font = `700 19px ${BODY}`;
+    ctx.fillText([`${n} EQUIPOS`, "PUNTOS TOTALES", t.qualify ? `CLASIFICAN ${t.qualify}` : ""].filter(Boolean).join("   ·   "), 60, 262);
+
+    // ranking columns
+    const colW = (W - PAD * 2 - GAP * (cols - 1)) / cols;
+    ctx.textBaseline = "middle";
+    t.rows.forEach((r, k) => {
+      const c = Math.floor(k / perCol), i = k % perCol;
+      const x = PAD + c * (colW + GAP), y = HEAD + i * ROW;
+      const q = k < t.qualify;
+      ctx.fillStyle = q ? "rgba(25,227,227,.09)" : i % 2 ? "rgba(255,255,255,.015)" : "rgba(25,227,227,.03)";
+      ctx.beginPath(); ctx.roundRect(x, y + 2, colW, ROW - 4, 8); ctx.fill();
+      if (q) { ctx.fillStyle = C.teal; ctx.fillRect(x, y + 2, 4, ROW - 4); }
+      // position
+      const medal = ["#19e3e3", "#cfdadc", "#0a8f99"][k];
+      const bs = ROW - 14;
+      if (medal) { ctx.fillStyle = medal; ctx.beginPath(); ctx.roundRect(x + 10, y + 7, bs, bs, 6); ctx.fill(); }
+      ctx.fillStyle = medal && k < 2 ? C.bg : medal ? "#fff" : C.teal;
+      ctx.font = `400 ${[28, 24, 21, 19][cols - 1]}px ${DISPLAY}`; ctx.textAlign = "center";
+      ctx.fillText(String(k + 1), x + 10 + bs / 2, y + ROW / 2 + 1);
+      // total
+      ctx.textAlign = "right"; ctx.fillStyle = C.teal;
+      ctx.font = `400 ${[34, 28, 24, 22][cols - 1]}px ${DISPLAY}`;
+      ctx.fillText(String(r.total), x + colW - 12, y + ROW / 2 + 1);
+      const totalW = ctx.measureText("000").width + (cols === 4 ? 8 : 16);
+      // team
+      ctx.textAlign = "left"; ctx.fillStyle = C.text;
+      const nameX = x + 10 + bs + 10;
+      fit(ctx, r.team.toUpperCase(), colW - (nameX - x) - totalW - 4, [24, 19, 16, 15][cols - 1], BODY, "700");
+      ctx.fillText(r.team.toUpperCase(), nameX, y + ROW / 2 + 1);
+      // cut line after the last qualified team
+      if (k === t.qualify - 1) {
+        ctx.setLineDash([8, 6]); ctx.strokeStyle = C.teal; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(x, y + ROW - 1); ctx.lineTo(x + colW, y + ROW - 1); ctx.stroke();
+        ctx.setLineDash([]); ctx.lineWidth = 1;
+      }
+    });
+
+    // footer
+    const fy = HEAD + perCol * ROW;
+    ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+    ctx.fillStyle = C.muted; ctx.font = `700 18px ${BODY}`;
+    ctx.fillText("PUNTOS = KILLS + P.P − SANCIONES", 60, fy + 48);
+    ctx.fillStyle = C.text; ctx.font = `400 34px ${DISPLAY}`;
+    ctx.fillText("@DFS.LEAGUE", 60, fy + 104);
+    ctx.textAlign = "right";
+    ctx.fillText("#GODFS   #SOMOSDFSLEAGUE", W - 60, fy + 104);
+    ctx.fillStyle = C.teal; ctx.font = `700 18px ${BODY}`;
+    ctx.fillText(location.hostname.replace(/^www\./, "") || "dfs.pumasgaming.com", W - 60, fy + 48);
+    return new Promise((res) => cv.toBlob(res, "image/png"));
+  }
+
   const save = (blob, name) => {
     const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: name });
     document.body.appendChild(a); a.click(); a.remove();
@@ -128,7 +222,7 @@ const DFSDownload = (() => {
   };
 
   async function png(t) {
-    save(await drawPng(t), `${fileBase(t)}.png`);
+    save(await (t.general ? drawGeneral(t) : drawPng(t)), `${fileBase(t)}.png`);
     if (typeof gtag === "function") gtag("event", "descargar_resultados", { fase: t.phase, tabla: t.title });
   }
 
