@@ -275,9 +275,14 @@
         return `<div class="row-card">${head}
           <div class="grid-2">${input(`results.${i}.qualify`, "Clasifican (top N)", { type: "number" })}</div>
           <p class="hint">Se calcula sola sumando todos los grupos de ${esc(r.phase)} (${rows.length} equipos con resultados).</p>
-          ${rows.length ? `<div class="table-wrap"><table class="edit-table"><thead><tr><th>#</th><th>Equipo</th><th>Grupo</th><th>Total</th></tr></thead><tbody>
-            ${rows.slice(0, 15).map((row, k) => `<tr class="${k < q ? "qualified" : ""}"><td>${k + 1}</td><td>${esc(row.team)}</td><td>${esc(row.group)}</td><td class="total">${total(row)}</td></tr>`).join("")}
-          </tbody></table></div>${rows.length > 15 ? `<p class="hint">… y ${rows.length - 15} más</p>` : ""}` : ""}
+          ${rows.length ? `<ol class="gen-grid admin-gen">${rows.map((row, k) => `
+            <li class="${k < q ? "qualified" : ""} ${k === q - 1 ? "cutline" : ""} ${k < 3 ? `top${k + 1}` : ""}">
+              <span class="gen-pos">${k + 1}</span>
+              <span class="gen-team"><b>${esc(row.team)}</b>
+                <small>${esc(row.group)} · K ${Number(row.kills) || 0} · P.P ${Number(row.placement) || 0}${row.penalty ? ` · S -${Number(row.penalty)}` : ""}</small></span>
+              <span class="gen-pts">${total(row)}</span>
+            </li>`).join("")}
+          </ol>` : ""}
         </div>`;
       }
       const ranked = new Set(sortRows(r.rows.filter((x) => (x.team || "").trim())).slice(0, q));

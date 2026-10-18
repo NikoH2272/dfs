@@ -660,3 +660,5 @@ body.modal-open { overflow: hidden; }
 }
 @media (max-width: 900px) { .gen-grid { columns: 2; } }
 @media (max-width: 560px) { .gen-grid { columns: 1; padding: 8px 12px 4px; } .gen-head { padding: 14px 12px 4px; } }
+.gen-grid.admin-gen { padding: 4px 0 0; }
+.gen-grid.admin-gen .gen-team small { text-transform: none; letter-spacing: .3px; }
