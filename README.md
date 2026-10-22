@@ -44,7 +44,7 @@ La web solo lee; todo lo que escribe el admin pasa por funciones `staff_*` que v
 
 ## Publicar cambios de código
 
-Los archivos se cargan con `?v=2.4.4` (en `index.html` y `admin.html`). Cuando cambies CSS/JS, sube ese número
+Los archivos se cargan con `?v=2.5.0` (en `index.html` y `admin.html`). Cuando cambies CSS/JS, sube ese número
 (por ejemplo a `2.4.4`) para que los navegadores descarguen la versión nueva en vez de usar la que tienen en caché.
 Los cambios hechos desde el admin (resultados, cronograma, etc.) no necesitan esto: se ven al recargar.
 

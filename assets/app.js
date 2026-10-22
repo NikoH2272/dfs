@@ -4,11 +4,11 @@
 
   // Mobile nav
   const toggle = $(".nav-toggle"), nav = $(".nav");
-  toggle.addEventListener("click", () => {
-    const open = nav.classList.toggle("open");
-    toggle.setAttribute("aria-expanded", open);
-  });
-  nav.addEventListener("click", (e) => { if (e.target.tagName === "A") nav.classList.remove("open"); });
+  const setNav = (open) => { nav.classList.toggle("open", open); toggle.setAttribute("aria-expanded", open); };
+  toggle.addEventListener("click", () => setNav(!nav.classList.contains("open")));
+  nav.addEventListener("click", (e) => { if (e.target.closest("a")) setNav(false); });
+  document.addEventListener("click", (e) => { if (nav.classList.contains("open") && !e.target.closest(".nav, .nav-toggle")) setNav(false); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && nav.classList.contains("open")) { setNav(false); toggle.focus(); } });
 
   let data;
   try {
