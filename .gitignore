@@ -1,3 +1,4 @@
 
 # Respaldos de la base (tienen usuarios y claves cifradas)
-supabase/respaldo/
+supabase/respaldo*
+respaldo*.sql
